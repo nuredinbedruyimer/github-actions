@@ -1,0 +1,13 @@
+name: Commment On Newly Created Issue
+
+on:
+  issues:
+    types: [opened]
+jobs:
+  comment_on_issues_with_workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Just Getting Github Context"
+        run: echo '${{toJSON(github.event)}}' | jq
+        shell: bash
+  
