@@ -1,24 +1,33 @@
-name: Commment On Newly Created Issue
+name: Comment on Newly Created Issue
 
 on:
   issues:
     types: [opened]
+
+permissions:
+  issues: write  # Ensure the workflow has permission to write comments on issues
+
 jobs:
-  comment_on_issues_with_workflow:
+  comment_on_new_issues:
     runs-on: ubuntu-latest
     steps:
-      - name: "Just Getting Github Context"
-        run: echo '${{toJSON(github.event)}}' | jq
+      # Step 1: Log GitHub event payload for debugging purposes
+      - name: Get GitHub Context (Debugging)
+        run: echo '${{ toJSON(github.event) }}' | jq
         shell: bash
+
+      # Step 2: Create a comment on the newly created issue
       - name: Create comment
         uses: peter-evans/create-or-update-comment@v4
         with:
-          issue-number: ${{github.event.issue.number}}
+          issue-number: ${{ github.event.issue.number }}
           body: |
-            This is a multi-line test comment
+            Hello! 👋
+            
+            Thank you for opening this issue. We appreciate your feedback and will review it as soon as possible.
+
             - With GitHub **Markdown** :sparkles:
             - Created by [create-or-update-comment][1]
 
             [1]: https://github.com/peter-evans/create-or-update-comment
           reactions: '+1'
-  
