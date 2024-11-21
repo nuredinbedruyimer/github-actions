@@ -5,18 +5,19 @@ on:
     types: [opened]
 
 permissions:
-  issues: write  # Ensure the workflow has permission to write comments on issues
+  issues: write  # Grants permission to write comments on issues
 
 jobs:
-  comment_on_new_issues:
+  # Job 1: Comment using 'peter-evans/create-or-update-comment'
+  comment_on_new_issues_using_Actions:
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Log GitHub event payload for debugging purposes
+      # Step 1: Log GitHub context (for debugging)
       - name: Get GitHub Context (Debugging)
         run: echo '${{ toJSON(github.event) }}' | jq
         shell: bash
-
-      # Step 2: Create a comment on the newly created issue
+      
+      # Step 2: Create a comment using the peter-evans action
       - name: Create comment
         uses: peter-evans/create-or-update-comment@v4
         with:
@@ -26,8 +27,23 @@ jobs:
             
             Thank you for opening this issue. We appreciate your feedback and will review it as soon as possible.
 
-            - With GitHub **Markdown** :sparkles:
-            - Created by [create-or-update-comment][1]
+            - This comment was created using **peter-evans/create-or-update-comment**! 🚀
 
-            [1]: https://github.com/peter-evans/create-or-update-comment
-          reactions: '+1'
+  # Job 2: Comment using GitHub API
+  comment_on_issue_using_api:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Post a comment using GitHub API
+      - name: Post Comment Using GitHub API
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub provides this token automatically
+        run: |
+          curl -X POST \
+          -H "Authorization: Bearer $GITHUB_TOKEN" \
+          -H "Accept: application/vnd.github+json" \
+          https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments \
+          -d @- << EOF
+          {
+            "body": "Hello! 👋\n\nThank you for opening this issue. We appreciate your feedback and will review it as soon as possible AND IT COMES FROM API.\n\n- This comment was posted using the **GitHub API**! 🚀"
+          }
+          EOF
